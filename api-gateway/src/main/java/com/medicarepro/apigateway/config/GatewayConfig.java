@@ -19,7 +19,6 @@ public class GatewayConfig {
     @Bean
     public RouteLocator routeLocator(RouteLocatorBuilder builder) {
         Builder routes = builder.routes();
-        System.out.println("ROUTES "+routeConfigProperties.getRoutes());
         routeConfigProperties.getRoutes().forEach((key, value) ->
                 routes
                         .route(key, route -> route.path("/api/" + extractServiceName(key) + "/**").uri(value))
