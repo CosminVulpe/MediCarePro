@@ -10,4 +10,6 @@ public interface MedicalHistoryMapping {
     MedicalHistoryMapping INSTANCE = Mappers.getMapper(MedicalHistoryMapping.class);
 
     MedicalHistoryDTO convertToDto(MedicalHistory source);
+
+    MedicalHistory convertToEntity(MedicalHistoryDTO source);
 }

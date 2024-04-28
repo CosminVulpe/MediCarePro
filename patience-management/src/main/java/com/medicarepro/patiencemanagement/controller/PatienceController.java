@@ -1,12 +1,12 @@
 package com.medicarepro.patiencemanagement.controller;
 
 import com.medicarepro.patiencemanagement.controller.dto.PatienceDTO;
+import com.medicarepro.patiencemanagement.controller.dto.PatienceRequest;
 import com.medicarepro.patiencemanagement.service.PatienceService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -26,5 +26,9 @@ public class PatienceController {
         return patienceService.findPatienceById(patienceId);
     }
 
-    
+    @PostMapping("/create")
+    public ResponseEntity<PatienceDTO> createPatience(@RequestBody @Valid PatienceRequest request) {
+        return patienceService.createPatience(request);
+    }
+
 }

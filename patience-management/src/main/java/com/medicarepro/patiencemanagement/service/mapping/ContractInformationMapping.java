@@ -10,4 +10,6 @@ public interface ContractInformationMapping {
     ContractInformationMapping INSTANCE = Mappers.getMapper(ContractInformationMapping.class);
 
     ContractInformationDTO convertToDto(ContractInformation source);
+
+    ContractInformation convertToEntity(ContractInformationDTO source);
 }

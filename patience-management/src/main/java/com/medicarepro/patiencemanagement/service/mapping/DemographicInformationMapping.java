@@ -12,4 +12,7 @@ public interface DemographicInformationMapping {
 
     @Mapping(source = "timeOfBirth", target = "timeOfBirth", dateFormat = "yyyy-MM-dd")
     DemographicInformationDTO convertToDto(DemographicInformation source);
+
+    @Mapping(source = "timeOfBirth", target = "timeOfBirth", dateFormat = "yyyy-MM-dd")
+    DemographicInformation convertToEntity(DemographicInformationDTO source);
 }

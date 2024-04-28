@@ -13,4 +13,9 @@ public interface InsuranceInformationMapping {
     @Mapping(source = "coverageDateStart", target = "coverageDateStart", dateFormat = "yyyy-MM-dd")
     @Mapping(source = "coverageDateEnd", target = "coverageDateEnd", dateFormat = "yyyy-MM-dd")
     InsuranceInformationDTO convertToDto(InsuranceInformation source);
+
+    @Mapping(source = "coverageDateStart", target = "coverageDateStart", dateFormat = "yyyy-MM-dd")
+    @Mapping(source = "coverageDateEnd", target = "coverageDateEnd", dateFormat = "yyyy-MM-dd")
+    InsuranceInformation convertToEntity(InsuranceInformationDTO source);
+
 }
