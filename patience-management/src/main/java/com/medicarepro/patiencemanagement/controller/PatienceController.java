@@ -31,4 +31,9 @@ public class PatienceController {
         return patienceService.createPatience(request);
     }
 
+    @PatchMapping("/update/{patienceId}")
+    public void updatePatience(@PathVariable Long patienceId,@RequestBody PatienceRequest request) {
+        patienceService.updatePatience(patienceId, request);
+    }
+
 }

@@ -14,9 +14,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
+import static java.util.Objects.nonNull;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
@@ -46,6 +48,11 @@ public class PatienceService {
         }
     }
 
+    public void updatePatience(Long patienceId, PatienceRequest request) {
+        Patience patienceOrThrow = getPatienceOrThrow(patienceId);
+        updatePatienceDetails(request, patienceOrThrow);
+    }
+
     private Patience getPatienceOrThrow(Long patienceId) {
         return patienceRepository.findById(patienceId).orElseThrow(() -> new PatienceIdException("Patience with ID cannot be found"));
     }
@@ -60,7 +67,7 @@ public class PatienceService {
 
     private Patience mapPatienceEntity(PatienceRequest request) {
         Patience patience = Patience.builder()
-                .patienceId(UUID.randomUUID().toString())
+                .patienceId(generatePatienceId())
                 .build();
         ContractInformation contractInformation = ContractInformationMapping.INSTANCE.convertToEntity(request.contractInformationRequest());
         contractInformation.setPatience(patience);
@@ -80,6 +87,130 @@ public class PatienceService {
         patience.setMedicalHistory(medicalHistory);
 
         return patience;
+    }
+
+    private static String generatePatienceId() {
+        return UUID.randomUUID().toString();
+    }
+
+    private void updatePatienceDetails(PatienceRequest request, Patience patience) {
+        ContractInformation contractInformation = patience.getContractInformation();
+        MedicalHistory medicalHistory = patience.getMedicalHistory();
+        InsuranceInformation insuranceInformation = patience.getInsuranceInformation();
+        DemographicInformation demographicInformation = patience.getDemographicInformation();
+
+        ContractInformationDTO contractInformationReq = request.contractInformationRequest();
+        MedicalHistoryDTO medicalHistoryReq = request.medicalHistoryRequest();
+        InsuranceInformationDTO insuranceInformationReq = request.insuranceInformationRequest();
+        DemographicInformationDTO demographicInformationReq = request.demographicInformationRequest();
+
+        patience.setContractInformation(getUpdateContractInfo(contractInformation, contractInformationReq));
+        patience.setMedicalHistory(getUpdateMedicalHistory(medicalHistory, medicalHistoryReq));
+        patience.setInsuranceInformation(getUpdateInsuranceInfo(insuranceInformation, insuranceInformationReq));
+        patience.setDemographicInformation(getUpdateDemographicInfo(demographicInformation, demographicInformationReq));
+
+        patienceRepository.save(patience);
+    }
+
+    private ContractInformation getUpdateContractInfo(ContractInformation contractInformation, ContractInformationDTO contractInformationReq) {
+        if (nonNull(contractInformationReq)) {
+            if (checkInfo(contractInformationReq.address())) {
+                contractInformation.setAddress(contractInformationReq.address());
+            }
+
+            if (checkInfo(contractInformationReq.phoneNumber())) {
+                contractInformation.setAddress(contractInformationReq.address());
+            }
+
+            if (checkInfo(contractInformationReq.email())) {
+                contractInformation.setEmail(contractInformationReq.email());
+            }
+        }
+        return contractInformation;
+    }
+
+    private MedicalHistory getUpdateMedicalHistory(MedicalHistory medicalHistory, MedicalHistoryDTO medicalHistoryReq) {
+        if (nonNull(medicalHistoryReq)) {
+            if (checkInfo(medicalHistoryReq.conditions())) {
+                medicalHistory.setConditions(medicalHistoryReq.conditions());
+            }
+
+            if (checkInfo(medicalHistoryReq.allergies())) {
+                medicalHistory.setAllergies(medicalHistoryReq.allergies());
+            }
+
+            if (checkInfo(medicalHistoryReq.medications())) {
+                medicalHistory.setMedications(medicalHistoryReq.medications());
+            }
+
+            if (checkInfo(medicalHistoryReq.surgeries())) {
+                medicalHistory.setSurgeries(medicalHistoryReq.surgeries());
+            }
+        }
+        return medicalHistory;
+    }
+
+    private InsuranceInformation getUpdateInsuranceInfo(InsuranceInformation insuranceInformation, InsuranceInformationDTO insuranceInformationReq) {
+        if (nonNull(insuranceInformationReq)) {
+            if (checkInfo(insuranceInformationReq.insuranceProvider())) {
+                insuranceInformation.setInsuranceProvider(insuranceInformationReq.insuranceProvider());
+            }
+
+            if (insuranceInformationReq.insurancePolicyNumber() != null && !insuranceInformationReq.insurancePolicyNumber().equals(0)) {
+                insuranceInformation.setInsurancePolicyNumber(insuranceInformationReq.insurancePolicyNumber());
+            }
+
+            LocalDate coverageDateStart = insuranceInformationReq.coverageDateStart();
+            LocalDate coverageDateEnd = insuranceInformationReq.coverageDateEnd();
+            if (checkInfo(coverageDateStart) && checkInfo(coverageDateEnd)) {
+                if (coverageDateStart.isBefore(coverageDateEnd)) {
+                    insuranceInformation.setCoverageDateStart(coverageDateStart);
+                }
+
+                if (coverageDateEnd.isAfter(coverageDateStart)) {
+                    insuranceInformation.setCoverageDateEnd(coverageDateEnd);
+                }
+            }
+        }
+        return insuranceInformation;
+    }
+
+    private DemographicInformation getUpdateDemographicInfo(DemographicInformation demographicInformation, DemographicInformationDTO demographicInformationReq) {
+        if (nonNull(demographicInformationReq)) {
+            if (checkInfo(demographicInformationReq.name())) {
+                demographicInformation.setName(demographicInformationReq.name());
+            }
+
+            if (demographicInformationReq.age() > 0 && demographicInformationReq.age() != demographicInformation.getAge()) {
+                demographicInformation.setAge(demographicInformationReq.age());
+            }
+
+            LocalDate timeOfBirth = demographicInformationReq.timeOfBirth();
+            if (checkInfo(timeOfBirth) && timeOfBirth.isBefore(LocalDate.now())) {
+                demographicInformation.setTimeOfBirth(demographicInformationReq.timeOfBirth());
+            }
+
+            if (demographicInformationReq.married() != demographicInformation.isMarried()) {
+                demographicInformation.setMarried(demographicInformationReq.married());
+            }
+
+            if (demographicInformationReq.hasKids() != demographicInformation.isHasKids()) {
+                demographicInformation.setHasKids(demographicInformationReq.hasKids());
+            }
+        }
+        return demographicInformation;
+    }
+
+    private boolean checkInfo(String value) {
+        return value != null && !value.isBlank();
+    }
+
+    private boolean checkInfo(LocalDate value) {
+        return value != null;
+    }
+
+    private boolean checkInfo(List<String> value) {
+        return value != null && !value.isEmpty();
     }
 
 }
