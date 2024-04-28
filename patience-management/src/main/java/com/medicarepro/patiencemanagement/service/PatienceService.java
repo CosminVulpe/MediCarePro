@@ -53,6 +53,11 @@ public class PatienceService {
         updatePatienceDetails(request, patienceOrThrow);
     }
 
+    public void deletePatienceById(Long patienceId) {
+        Patience patience = getPatienceOrThrow(patienceId);
+        patienceRepository.delete(patience);
+    }
+
     private Patience getPatienceOrThrow(Long patienceId) {
         return patienceRepository.findById(patienceId).orElseThrow(() -> new PatienceIdException("Patience with ID cannot be found"));
     }

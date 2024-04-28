@@ -36,4 +36,9 @@ public class PatienceController {
         patienceService.updatePatience(patienceId, request);
     }
 
+    @DeleteMapping("/delete/{patienceId}")
+    public void deletePatience(@PathVariable Long patienceId) {
+        patienceService.deletePatienceById(patienceId);
+    }
+
 }
