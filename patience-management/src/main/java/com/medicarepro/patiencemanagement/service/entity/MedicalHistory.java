@@ -30,19 +30,19 @@ public class MedicalHistory {
     private Long id;
 
     @Convert(converter = ConverterList.class)
-    @Column(name = "conditions", nullable = false)
+    @Column(name = "conditions")
     private List<String> conditions = new ArrayList<>();
 
     @Convert(converter = ConverterList.class)
-    @Column(name = "allergies", nullable = false)
+    @Column(name = "allergies")
     private List<String> allergies = new ArrayList<>();
 
     @Convert(converter = ConverterList.class)
-    @Column(name = "medications", nullable = false)
+    @Column(name = "medications")
     private List<String> medications = new ArrayList<>();
 
     @Convert(converter = ConverterList.class)
-    @Column(name = "surgeries", nullable = false)
+    @Column(name = "surgeries")
     private List<String> surgeries = new ArrayList<>();
 
     @JsonBackReference
