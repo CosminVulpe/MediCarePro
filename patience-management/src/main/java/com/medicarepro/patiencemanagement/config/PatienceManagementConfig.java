@@ -243,6 +243,6 @@ public class PatienceManagementConfig {
     }
 
     private String generatePatienceId() {
-        return UUID.randomUUID().toString();
+        return UUID.randomUUID().toString().split("-")[0];
     }
 }

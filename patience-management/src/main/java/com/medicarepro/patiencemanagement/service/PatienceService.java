@@ -40,7 +40,7 @@ public class PatienceService {
     public ResponseEntity<PatienceDTO> createPatience(PatienceRequest request) {
         try {
             Patience enrolledPatience = patienceRepository.save(mapPatienceEntity(request));
-            log.info("Patience with id {} saved successfully", enrolledPatience.getPatienceId());
+            log.info("Patience with patienceId {} saved successfully", enrolledPatience.getPatienceId());
             return ResponseEntity.status(CREATED).body(mapPatienceEntity(enrolledPatience));
         } catch (PersistenceException e) {
             log.error("Failed to save patience", e);
@@ -50,11 +50,13 @@ public class PatienceService {
 
     public void updatePatience(Long patienceId, PatienceRequest request) {
         Patience patienceOrThrow = getPatienceOrThrow(patienceId);
+        log.info("Info updated for patienceId {} ", patienceOrThrow.getPatienceId());
         updatePatienceDetails(request, patienceOrThrow);
     }
 
     public void deletePatienceById(Long patienceId) {
         Patience patience = getPatienceOrThrow(patienceId);
+        log.info("Patience with patienceId {} was deleted", patience.getPatienceId());
         patienceRepository.delete(patience);
     }
 
@@ -92,10 +94,6 @@ public class PatienceService {
         patience.setMedicalHistory(medicalHistory);
 
         return patience;
-    }
-
-    private static String generatePatienceId() {
-        return UUID.randomUUID().toString();
     }
 
     private void updatePatienceDetails(PatienceRequest request, Patience patience) {
@@ -216,6 +214,10 @@ public class PatienceService {
 
     private boolean checkInfo(List<String> value) {
         return value != null && !value.isEmpty();
+    }
+
+    private String generatePatienceId() {
+        return UUID.randomUUID().toString().split("-")[0];
     }
 
 }
