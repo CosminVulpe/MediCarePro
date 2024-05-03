@@ -22,7 +22,7 @@ public class PatienceController {
     }
 
     @GetMapping("/{patienceId}")
-    public PatienceDTO getAllPatience(@PathVariable Long patienceId) {
+    public PatienceDTO getPatienceById(@PathVariable Long patienceId) {
         return patienceService.findPatienceById(patienceId);
     }
 

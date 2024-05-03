@@ -122,7 +122,7 @@ public class PatienceService {
             }
 
             if (checkInfo(contractInformationReq.phoneNumber())) {
-                contractInformation.setAddress(contractInformationReq.address());
+                contractInformation.setPhoneNumber(contractInformationReq.phoneNumber());
             }
 
             if (checkInfo(contractInformationReq.email())) {
