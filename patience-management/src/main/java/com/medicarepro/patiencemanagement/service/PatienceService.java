@@ -44,7 +44,7 @@ public class PatienceService {
             return ResponseEntity.status(CREATED).body(mapPatienceEntity(enrolledPatience));
         } catch (PersistenceException e) {
             log.error("Failed to save patience", e);
-            return ResponseEntity.status(INTERNAL_SERVER_ERROR).build();
+            throw e;
         }
     }
 

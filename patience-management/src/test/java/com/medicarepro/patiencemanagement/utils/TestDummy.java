@@ -1,7 +1,12 @@
 package com.medicarepro.patiencemanagement.utils;
 
+import com.medicarepro.patiencemanagement.controller.dto.*;
 import com.medicarepro.patiencemanagement.service.Gender;
 import com.medicarepro.patiencemanagement.service.entity.*;
+import com.medicarepro.patiencemanagement.service.mapping.ContractInformationMapping;
+import com.medicarepro.patiencemanagement.service.mapping.DemographicInformationMapping;
+import com.medicarepro.patiencemanagement.service.mapping.InsuranceInformationMapping;
+import com.medicarepro.patiencemanagement.service.mapping.MedicalHistoryMapping;
 
 import java.time.LocalDate;
 import java.time.Month;
@@ -11,7 +16,9 @@ import java.util.UUID;
 
 public class TestDummy {
 
-    private TestDummy() {}
+
+    private TestDummy() {
+    }
 
     public static List<Patience> getAllPatiences() {
         Patience johnDoe = Patience.builder()
@@ -230,7 +237,44 @@ public class TestDummy {
         return List.of(johnDoe, janeSmith, maryJohnson, robertMiller, emilyBrown);
     }
 
+    public static PatienceRequest getPatienceReqMock() {
+        Patience patience = getAllPatiences().get(0);
+        return mapToPatienceReq(patience);
+    }
+
     private static String generatePatienceId() {
         return UUID.randomUUID().toString().split("-")[0];
+    }
+
+    private static PatienceRequest mapToPatienceReq(Patience patience) {
+        ContractInformationDTO contractInformationDTO = ContractInformationMapping.INSTANCE.convertToDto(patience.getContractInformation());
+        DemographicInformationDTO demographicInformationDTO = DemographicInformationMapping.INSTANCE.convertToDto(patience.getDemographicInformation());
+        InsuranceInformationDTO insuranceInformationDTO = InsuranceInformationMapping.INSTANCE.convertToDto(patience.getInsuranceInformation());
+        MedicalHistoryDTO medicalHistoryDTO = MedicalHistoryMapping.INSTANCE.convertToDto(patience.getMedicalHistory());
+        return new PatienceRequest(contractInformationDTO, demographicInformationDTO, insuranceInformationDTO, medicalHistoryDTO);
+    }
+
+    private static Patience mapPatienceEntity(PatienceRequest request) {
+        Patience patience = Patience.builder()
+                .patienceId(generatePatienceId())
+                .build();
+        ContractInformation contractInformation = ContractInformationMapping.INSTANCE.convertToEntity(request.contractInformationRequest());
+        contractInformation.setPatience(patience);
+
+        DemographicInformation demographicInformation = DemographicInformationMapping.INSTANCE.convertToEntity(request.demographicInformationRequest());
+        demographicInformation.setPatience(patience);
+
+        InsuranceInformation insuranceInformation = InsuranceInformationMapping.INSTANCE.convertToEntity(request.insuranceInformationRequest());
+        insuranceInformation.setPatience(patience);
+
+        MedicalHistory medicalHistory = MedicalHistoryMapping.INSTANCE.convertToEntity(request.medicalHistoryRequest());
+        medicalHistory.setPatience(patience);
+
+        patience.setContractInformation(contractInformation);
+        patience.setDemographicInformation(demographicInformation);
+        patience.setInsuranceInformation(insuranceInformation);
+        patience.setMedicalHistory(medicalHistory);
+
+        return patience;
     }
 }
