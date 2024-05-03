@@ -1,7 +1,6 @@
-package com.medicarepro.patiencemanagement.service.unit;
+package com.medicarepro.patiencemanagement.service;
 
 import com.medicarepro.patiencemanagement.controller.dto.PatienceDTO;
-import com.medicarepro.patiencemanagement.service.PatienceService;
 import com.medicarepro.patiencemanagement.service.exception.PatienceIdException;
 import com.medicarepro.patiencemanagement.service.repository.PatienceRepository;
 import org.junit.jupiter.api.Test;
@@ -13,7 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 import java.util.Optional;
 
-import static com.medicarepro.patiencemanagement.utils.TestDummy.getAllPatience;
+import static com.medicarepro.patiencemanagement.utils.TestDummy.getAllPatiences;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -22,18 +21,18 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class PatienceServiceTest {
+    private static final long ID = 10L;
+
     @Mock
     private PatienceRepository patienceRepository;
 
     @InjectMocks
     private PatienceService patienceService;
 
-    private static final long ID = 10L;
-
 
     @Test
     void shouldGetAllPatience() {
-        when(patienceRepository.findAll()).thenReturn(getAllPatience());
+        when(patienceRepository.findAll()).thenReturn(getAllPatiences());
 
         List<PatienceDTO> patienceDTOS = patienceService.getAll();
         assertThat(patienceDTOS).isNotNull();
@@ -61,7 +60,7 @@ public class PatienceServiceTest {
 
     @Test
     void shouldFindPatienceById() {
-        when(patienceRepository.findById(any())).thenReturn(Optional.ofNullable(getAllPatience().get(0)));
+        when(patienceRepository.findById(any())).thenReturn(Optional.ofNullable(getAllPatiences().get(0)));
 
         PatienceDTO patienceById = patienceService.findPatienceById(ID);
         assertThat(patienceById).isNotNull();

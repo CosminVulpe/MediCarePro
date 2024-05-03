@@ -13,7 +13,7 @@ public class TestDummy {
 
     private TestDummy() {}
 
-    public static List<Patience> getAllPatience() {
+    public static List<Patience> getAllPatiences() {
         Patience johnDoe = Patience.builder()
                 .patienceId(generatePatienceId())
                 .build();
