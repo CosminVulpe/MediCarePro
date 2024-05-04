@@ -149,7 +149,7 @@ public class PatienceControllerIT {
         ContractInformationDTO contractInformation = patienceReqMock.contractInformationRequest();
         ContractInformationDTO contractInformationDTO = new ContractInformationDTO(contractInformation.address(), "074929375897234", contractInformation.email());
 
-        return new PatienceRequest(contractInformationDTO, patienceReqMock.demographicInformationRequest(), patienceReqMock.insuranceInformationRequest(), patienceReqMock.medicalHistoryRequest());
+        return new PatienceRequest(contractInformationDTO, patienceReqMock.demographicInformationRequest(), patienceReqMock.insuranceInformationRequest(), patienceReqMock.medicalHistoryRequest(),"John");
     }
 
     private Patience getPatience(int i) {

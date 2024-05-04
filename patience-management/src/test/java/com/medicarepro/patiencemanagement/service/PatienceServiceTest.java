@@ -1,8 +1,10 @@
 package com.medicarepro.patiencemanagement.service;
 
+import com.medicarepro.patiencemanagement.controller.dto.DoctorIdResponse;
 import com.medicarepro.patiencemanagement.controller.dto.PatienceDTO;
 import com.medicarepro.patiencemanagement.service.entity.Patience;
 import com.medicarepro.patiencemanagement.service.exception.PatienceIdException;
+import com.medicarepro.patiencemanagement.service.repository.HealthcareProxyClient;
 import com.medicarepro.patiencemanagement.service.repository.PatienceRepository;
 import jakarta.persistence.PersistenceException;
 import org.junit.jupiter.api.Test;
@@ -10,6 +12,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
@@ -28,6 +31,8 @@ public class PatienceServiceTest {
 
     @Mock
     private PatienceRepository patienceRepository;
+    @Mock
+    private HealthcareProxyClient proxyClient;
 
     @InjectMocks
     private PatienceService patienceService;
@@ -67,17 +72,21 @@ public class PatienceServiceTest {
     @Test
     void createPatienceSuccessfully() {
         Patience patience = getOptionalPatience().get();
+        ResponseEntity<DoctorIdResponse> body = ResponseEntity.status(HttpStatus.NO_CONTENT.value()).body(new DoctorIdResponse(1L));
+
         when(patienceRepository.save(any())).thenReturn(patience);
+        when(proxyClient.assignPatience(any())).thenReturn(body);
 
         ResponseEntity<PatienceDTO> response = patienceService.createPatience(getPatienceReqMock());
         assertThat(response.getBody()).isNotNull();
         verify(patienceRepository).save(any());
     }
 
-
     @Test
     void shouldThrowExceptionWhenAddingANewPatience() {
         doThrow(new PersistenceException()).when(patienceRepository).save(any());
+        ResponseEntity<DoctorIdResponse> body = ResponseEntity.status(HttpStatus.NO_CONTENT.value()).body(new DoctorIdResponse(1L));
+        when(proxyClient.assignPatience(any())).thenReturn(body);
 
         assertThatThrownBy(() -> patienceService.createPatience(getPatienceReqMock())).isInstanceOf(PersistenceException.class);
     }
@@ -97,7 +106,6 @@ public class PatienceServiceTest {
         patienceService.deletePatienceById(ID);
         verify(patienceRepository).delete(any());
     }
-
 
     private Optional<Patience> getOptionalPatience() {
         return Optional.of(getAllPatiences().get(0));
