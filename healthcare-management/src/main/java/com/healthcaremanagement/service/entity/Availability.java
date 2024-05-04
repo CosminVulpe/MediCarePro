@@ -8,7 +8,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.DayOfWeek;
-import java.util.List;
 
 @Entity
 @Data
@@ -23,8 +22,8 @@ public class Availability {
     @Enumerated(EnumType.STRING)
     private DayOfWeek dayOfWeek;
 
-    @OneToMany(mappedBy = "availability", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<TimeSlot> timeSlots;
+    @OneToOne(mappedBy = "availability", cascade = CascadeType.ALL, orphanRemoval = true)
+    private TimeSlot timeSlot;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Doctor doctor;

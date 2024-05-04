@@ -22,7 +22,7 @@ public class ContactInfo {
     private String phoneNumber;
     private String address;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @MapsId
     private Doctor doctor;
 }

@@ -23,10 +23,10 @@ public class Doctor {
     @Enumerated(EnumType.STRING)
     private DoctorSpecialty specialty;
 
-    @OneToOne(mappedBy = "doctor", fetch = FetchType.LAZY, orphanRemoval = true)
+    @OneToOne(mappedBy = "doctor", cascade = CascadeType.ALL, orphanRemoval = true)
     private ContactInfo contactInfo;
 
-    @OneToMany(mappedBy = "doctor", fetch = FetchType.LAZY, orphanRemoval = true)
+    @OneToMany(mappedBy = "doctor", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Availability> availabilityList;
 
 }
