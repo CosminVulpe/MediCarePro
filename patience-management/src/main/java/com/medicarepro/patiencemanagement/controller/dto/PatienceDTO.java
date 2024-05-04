@@ -14,6 +14,8 @@ public record PatienceDTO(
         InsuranceInformationDTO insuranceInformationDTO,
 
         @JsonProperty("medicalHistory")
-        MedicalHistoryDTO medicalHistoryDTO
+        MedicalHistoryDTO medicalHistoryDTO,
+
+        Long doctorId
 ) {
 }

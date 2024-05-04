@@ -7,41 +7,57 @@ import com.medicarepro.patiencemanagement.service.mapping.ContractInformationMap
 import com.medicarepro.patiencemanagement.service.mapping.DemographicInformationMapping;
 import com.medicarepro.patiencemanagement.service.mapping.InsuranceInformationMapping;
 import com.medicarepro.patiencemanagement.service.mapping.MedicalHistoryMapping;
+import com.medicarepro.patiencemanagement.service.repository.HealthcareProxyClient;
 import com.medicarepro.patiencemanagement.service.repository.PatienceRepository;
 import jakarta.persistence.PersistenceException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 import static java.util.Objects.nonNull;
 import static org.springframework.http.HttpStatus.CREATED;
-import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
 @Service
 @Slf4j
 @AllArgsConstructor
 public class PatienceService {
     private final PatienceRepository patienceRepository;
+    private final HealthcareProxyClient healthcareProxyClient;
 
     public List<PatienceDTO> getAll() {
         List<Patience> patienceList = patienceRepository.findAll();
-        return patienceList.parallelStream().map(this::mapPatienceEntity).toList();
+        return patienceList.parallelStream().map(patience -> mapPatienceEntity(patience, Optional.of(patience.getDoctorId()))).toList();
     }
 
     public PatienceDTO findPatienceById(Long patienceId) {
-        return mapPatienceEntity(getPatienceOrThrow(patienceId));
+        Patience patience = getPatienceOrThrow(patienceId);
+        return mapPatienceEntity(patience, Optional.of(patience.getDoctorId()));
     }
 
     public ResponseEntity<PatienceDTO> createPatience(PatienceRequest request) {
         try {
-            Patience enrolledPatience = patienceRepository.save(mapPatienceEntity(request));
+            Patience patience = mapPatienceEntity(request);
+            ResponseEntity<DoctorIdResponse> doctorIdResponseResponseEntity = healthcareProxyClient.assignPatience(new PatienceIdRequest(request.doctorName(), patience.getId()));
+
+            if (doctorIdResponseResponseEntity.getStatusCode() != HttpStatus.NO_CONTENT
+                    && Objects.nonNull(doctorIdResponseResponseEntity.getBody())) {
+
+                DoctorIdResponse response = doctorIdResponseResponseEntity.getBody();
+                patience.setDoctorId(response.id());
+            }
+
+            Patience enrolledPatience = patienceRepository.save(patience);
             log.info("Patience with patienceId {} saved successfully", enrolledPatience.getPatienceId());
-            return ResponseEntity.status(CREATED).body(mapPatienceEntity(enrolledPatience));
+
+            return ResponseEntity.status(CREATED).body(mapPatienceEntity(enrolledPatience, Optional.ofNullable(patience.getDoctorId())));
         } catch (PersistenceException e) {
             log.error("Failed to save patience", e);
             throw e;
@@ -64,12 +80,15 @@ public class PatienceService {
         return patienceRepository.findById(patienceId).orElseThrow(() -> new PatienceIdException("Patience with ID cannot be found"));
     }
 
-    private PatienceDTO mapPatienceEntity(Patience patience) {
+    private PatienceDTO mapPatienceEntity(Patience patience, Optional<Long> optionalDoctorId) {
         ContractInformationDTO contractInformationDTO = ContractInformationMapping.INSTANCE.convertToDto(patience.getContractInformation());
         DemographicInformationDTO demographicInformationDTO = DemographicInformationMapping.INSTANCE.convertToDto(patience.getDemographicInformation());
         InsuranceInformationDTO insuranceInformationDTO = InsuranceInformationMapping.INSTANCE.convertToDto(patience.getInsuranceInformation());
         MedicalHistoryDTO medicalHistoryDTO = MedicalHistoryMapping.INSTANCE.convertToDto(patience.getMedicalHistory());
-        return new PatienceDTO(patience.getPatienceId(), demographicInformationDTO, contractInformationDTO, insuranceInformationDTO, medicalHistoryDTO);
+        Long doctorId = optionalDoctorId.orElse(null);
+
+        return new PatienceDTO(patience.getPatienceId(), demographicInformationDTO
+                , contractInformationDTO, insuranceInformationDTO, medicalHistoryDTO, doctorId);
     }
 
     private Patience mapPatienceEntity(PatienceRequest request) {

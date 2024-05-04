@@ -1,6 +1,7 @@
 package com.medicarepro.patiencemanagement.controller.dto;
 
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public record PatienceRequest(
@@ -14,6 +15,9 @@ public record PatienceRequest(
         InsuranceInformationDTO insuranceInformationRequest,
 
         @NotNull
-        MedicalHistoryDTO medicalHistoryRequest
+        MedicalHistoryDTO medicalHistoryRequest,
+
+        @NotBlank
+        String doctorName
 ) {
 }

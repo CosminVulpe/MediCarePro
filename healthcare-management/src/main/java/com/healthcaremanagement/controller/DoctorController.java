@@ -1,11 +1,12 @@
 package com.healthcaremanagement.controller;
 
 import com.healthcaremanagement.controller.dto.DoctorDTO;
+import com.healthcaremanagement.controller.dto.DoctorIdResponse;
+import com.healthcaremanagement.controller.dto.PatienceIdRequest;
 import com.healthcaremanagement.service.DoctorService;
 import lombok.AllArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -18,6 +19,11 @@ public class DoctorController {
     @GetMapping
     public List<DoctorDTO> getAll() {
         return doctorService.getAllDoctors();
+    }
+
+    @PostMapping
+    public ResponseEntity<DoctorIdResponse> assignPatience(@RequestBody PatienceIdRequest request) {
+        return doctorService.assignPatience(request);
     }
 
 }
