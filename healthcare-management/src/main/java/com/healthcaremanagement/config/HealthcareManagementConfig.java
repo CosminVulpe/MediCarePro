@@ -6,7 +6,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Random;
@@ -15,7 +15,6 @@ import java.util.Random;
 public class HealthcareManagementConfig {
     private static final Random RANDOM = new Random();
     private static final DoctorSpecialty[] DOCTOR_SPECIALTIES = DoctorSpecialty.values();
-    private static final DayOfWeek[] DAY_OF_WEEKS = DayOfWeek.values();
 
     @Bean
     CommandLineRunner commandLineRunner(DoctorRepository doctorRepository) {
@@ -44,14 +43,16 @@ public class HealthcareManagementConfig {
                 .doctor(doctor)
                 .build();
 
+        LocalDate date = LocalDate.now().plusDays(RANDOM.nextInt(365) + 1);
         Availability availability = Availability.builder()
-                .dayOfWeek(DAY_OF_WEEKS[(int) (Math.random() * DAY_OF_WEEKS.length)])
+                .dayOfWeek(date.getDayOfWeek())
                 .doctor(doctor)
                 .build();
 
         TimeSlot timeSlot = TimeSlot.builder()
                 .startTime(LocalTime.of(9 + (int) (Math.random() * 10), 30))
                 .endTime(LocalTime.of(12 + (int) (Math.random() * 9), 30))
+                .date(date)
                 .availability(availability)
                 .build();
 
