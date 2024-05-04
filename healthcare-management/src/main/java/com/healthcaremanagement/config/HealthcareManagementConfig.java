@@ -19,21 +19,27 @@ public class HealthcareManagementConfig {
     @Bean
     CommandLineRunner commandLineRunner(DoctorRepository doctorRepository) {
         return args -> {
-            Doctor johnSmith = createDoctor("Dr. John Smith", "johnsmith@yahoo.com", "123 Main St", "0985123456");
-            Doctor emilyJohnson = createDoctor("Dr. Emily Johnson", "emilyjohnson@yahoo.com", "456 Elm St", "0985234567");
-            Doctor michaelWilliams = createDoctor("Dr. Michael Williams", "michaelwilliams@yahoo.com", "789 Oak St", "0985345678");
-            Doctor sarahBrown = createDoctor("Dr. Sarah Brown", "sarahbrown@yahoo.com", "1011 Pine St", "0985456789");
-            Doctor christopherLee = createDoctor("Dr. Christopher Lee", "christopherlee@yahoo.com", "1213 Cedar St", "0985567890");
+            Doctor johnSmith = createDoctor("Dr. John Smith", "johnsmith@yahoo.com"
+                    , "123 Main St", "0985123456", List.of(1L));
+            Doctor emilyJohnson = createDoctor("Dr. Emily Johnson", "emilyjohnson@yahoo.com"
+                    , "456 Elm St", "0985234567", List.of(2L));
+            Doctor michaelWilliams = createDoctor("Dr. Michael Williams", "michaelwilliams@yahoo.com"
+                    , "789 Oak St", "0985345678", List.of(3L));
+            Doctor sarahBrown = createDoctor("Dr. Sarah Brown", "sarahbrown@yahoo.com"
+                    , "1011 Pine St", "0985456789", List.of(4L));
+            Doctor christopherLee = createDoctor("Dr. Christopher Lee", "christopherlee@yahoo.com"
+                    , "1213 Cedar St", "0985567890",List.of(5L));
 
             doctorRepository.saveAll(List.of(johnSmith, emilyJohnson, michaelWilliams, sarahBrown, christopherLee));
         };
 
     }
 
-    private static Doctor createDoctor(String name, String email, String address, String phoneNumber) {
+    private static Doctor createDoctor(String name, String email, String address, String phoneNumber, List<Long> patienceIds) {
         Doctor doctor = Doctor.builder()
                 .name(name)
                 .specialty(DOCTOR_SPECIALTIES[RANDOM.nextInt(DOCTOR_SPECIALTIES.length)])
+                .patienceIds(patienceIds)
                 .build();
 
         ContactInfo contactInfo = ContactInfo.builder()

@@ -35,4 +35,6 @@ public class Patience {
     @JsonManagedReference
     @OneToOne(mappedBy = "patience", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private MedicalHistory medicalHistory;
+
+    private Long doctorId;
 }
