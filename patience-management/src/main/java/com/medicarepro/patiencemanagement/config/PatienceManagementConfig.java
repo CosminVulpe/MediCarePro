@@ -64,7 +64,7 @@ public class PatienceManagementConfig {
             johnDoe.setContractInformation(johnDoeContract);
             johnDoe.setInsuranceInformation(johnDoeInsurance);
             johnDoe.setMedicalHistory(johnDoeMedicalHistory);
-            johnDoe.setDoctorId(1L);
+            johnDoe.setDoctorIds(List.of(1L));
 
 
             Patience janeSmith = Patience.builder()
@@ -108,7 +108,7 @@ public class PatienceManagementConfig {
             janeSmith.setContractInformation(janeSmithContract);
             janeSmith.setInsuranceInformation(janeSmithInsurance);
             janeSmith.setMedicalHistory(janeSmithMedicalHistory);
-            janeSmith.setDoctorId(2L);
+            janeSmith.setDoctorIds(List.of(2L));
 
             Patience maryJohnson = Patience.builder()
                     .patienceId(generatePatienceId())
@@ -151,7 +151,7 @@ public class PatienceManagementConfig {
             maryJohnson.setContractInformation(maryJohnsonContract);
             maryJohnson.setInsuranceInformation(maryJohnsonInsurance);
             maryJohnson.setMedicalHistory(maryJohnsonMedicalHistory);
-            maryJohnson.setDoctorId(3L);
+            maryJohnson.setDoctorIds(List.of(3L));
 
             Patience robertMiller = Patience.builder()
                     .patienceId(generatePatienceId())
@@ -194,7 +194,7 @@ public class PatienceManagementConfig {
             robertMiller.setContractInformation(robertMillerContract);
             robertMiller.setInsuranceInformation(robertMillerInsurance);
             robertMiller.setMedicalHistory(robertMillerMedicalHistory);
-            robertMiller.setDoctorId(4L);
+            robertMiller.setDoctorIds(List.of(4L));
 
             Patience emilyBrown = Patience.builder()
                     .patienceId(generatePatienceId())
@@ -237,7 +237,7 @@ public class PatienceManagementConfig {
             emilyBrown.setContractInformation(emilyBrownContract);
             emilyBrown.setInsuranceInformation(emilyBrownInsurance);
             emilyBrown.setMedicalHistory(emilyBrownMedicalHistory);
-            emilyBrown.setDoctorId(5L);
+            emilyBrown.setDoctorIds(List.of(5L));
 
             repository.saveAllAndFlush(List.of(johnDoe, janeSmith, maryJohnson, robertMiller, emilyBrown));
         };

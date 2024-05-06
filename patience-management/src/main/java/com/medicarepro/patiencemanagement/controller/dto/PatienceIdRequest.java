@@ -1,7 +1,9 @@
 package com.medicarepro.patiencemanagement.controller.dto;
 
+import java.util.List;
+
 public record PatienceIdRequest(
-        String doctorName,
+        List<String> doctorNames,
         Long patienceId
 ) {
 }

@@ -11,6 +11,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 public interface HealthcareProxyClient {
     String url = "/api/healthcare";
 
-    @PostMapping(url)
+    @PostMapping(url + "/assign")
     ResponseEntity<DoctorIdResponse> assignPatience(@RequestBody PatienceIdRequest request);
 }

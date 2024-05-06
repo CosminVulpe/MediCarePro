@@ -1,4 +1,6 @@
 package com.healthcaremanagement.controller.dto;
 
-public record DoctorIdResponse(Long id) {
+import java.util.List;
+
+public record DoctorIdResponse(List<Long> ids) {
 }

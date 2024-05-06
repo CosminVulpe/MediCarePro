@@ -2,6 +2,8 @@ package com.medicarepro.patiencemanagement.controller.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.List;
+
 public record PatienceDTO(
         String patienceId,
         @JsonProperty("demographicInformation")
@@ -16,6 +18,6 @@ public record PatienceDTO(
         @JsonProperty("medicalHistory")
         MedicalHistoryDTO medicalHistoryDTO,
 
-        Long doctorId
+        List<Long> doctorIds
 ) {
 }

@@ -6,13 +6,13 @@ import com.healthcaremanagement.service.entity.Doctor;
 import com.healthcaremanagement.service.mapping.AvailabilityMapping;
 import com.healthcaremanagement.service.mapping.ContactInfoMapping;
 import com.healthcaremanagement.service.repository.DoctorRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.List;
 
 @Service
@@ -27,15 +27,24 @@ public class DoctorService {
     }
 
     public ResponseEntity<DoctorIdResponse> assignPatience(PatienceIdRequest request) {
-        List<Doctor> doctorsByName = doctorRepository.findDoctorsByName(request.doctorName());
-        if (doctorsByName.isEmpty()) {
+        List<Doctor> doctorList = request.doctorNames().stream().map(doctorRepository::findDoctorsByName)
+                .flatMap(Collection::stream).toList();
+
+        if (doctorList.isEmpty()) {
             log.warn("No doctor found with name provided");
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
-        Doctor doctor = doctorsByName.stream().findFirst().orElseThrow(() -> new EntityNotFoundException("Doctor not found"));
-        doctor.getPatienceIds().add(request.patienceId());
-        doctorRepository.save(doctor);
-        return ResponseEntity.ok(new DoctorIdResponse(doctor.getId()));
+
+        doctorList.forEach(doctor -> {
+            if (doctor.getPatienceIds().isEmpty()) {
+                doctor.setPatienceIds(List.of(request.patienceId()));
+            } else {
+                doctor.getPatienceIds().add(request.patienceId());
+            }
+            doctorRepository.save(doctor);
+        });
+
+        return ResponseEntity.ok(new DoctorIdResponse(doctorList.stream().map(Doctor::getId).toList()));
     }
 
     private DoctorDTO computeDoctorDTO(Doctor doctor) {

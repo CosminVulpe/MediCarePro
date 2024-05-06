@@ -21,7 +21,7 @@ public class DoctorController {
         return doctorService.getAllDoctors();
     }
 
-    @PostMapping
+    @PostMapping("/assign")
     public ResponseEntity<DoctorIdResponse> assignPatience(@RequestBody PatienceIdRequest request) {
         return doctorService.assignPatience(request);
     }

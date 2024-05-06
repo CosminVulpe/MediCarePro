@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 
 @Entity
 @AllArgsConstructor
@@ -36,5 +38,6 @@ public class Patience {
     @OneToOne(mappedBy = "patience", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private MedicalHistory medicalHistory;
 
-    private Long doctorId;
+    @ElementCollection
+    private List<Long> doctorIds;
 }
