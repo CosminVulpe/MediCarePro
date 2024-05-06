@@ -40,8 +40,7 @@ public class PatienceService {
     }
 
     public ResponseEntity<PatienceDTO> createPatience(PatienceRequest request) {
-        String name = request.demographicInformationRequest().name().split(" ")[1];
-        int doesPatienceExist = patienceRepository.doesPatienceExist(name);
+        int doesPatienceExist = patienceRepository.doesPatienceExist(request.demographicInformationRequest().name());
 
         if (doesPatienceExist >= 1) {
             log.warn("Patience is already in our DB");

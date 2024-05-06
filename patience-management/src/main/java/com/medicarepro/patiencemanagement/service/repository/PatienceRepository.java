@@ -9,9 +9,8 @@ import org.springframework.stereotype.Repository;
 public interface PatienceRepository extends JpaRepository<Patience, Long> {
 
     @Query(value = """
-            SELECT COUNT(SPLIT_PART(name, ' ', 2))
-             FROM demographic_information 
-             WHERE upper(SPLIT_PART(name, ' ', 2)) = upper(:name)
+            SELECT COUNT(name)
+            FROM demographic_information WHERE name = :name
             """, nativeQuery = true)
     int doesPatienceExist(String name);
 
