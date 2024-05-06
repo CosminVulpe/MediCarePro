@@ -18,7 +18,7 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 import java.util.Optional;
 
-import static com.medicarepro.patiencemanagement.utils.TestDummy.getAllPatiences;
+import static com.medicarepro.patiencemanagement.utils.TestDummy.getAllPatients;
 import static com.medicarepro.patiencemanagement.utils.TestDummy.getPatienceReqMock;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -39,7 +39,7 @@ public class PatienceServiceTest {
 
     @Test
     void shouldGetAllPatience() {
-        when(patienceRepository.findAll()).thenReturn(getAllPatiences());
+        when(patienceRepository.findAll()).thenReturn(getAllPatients());
 
         List<PatienceDTO> patienceDTOS = patienceService.getAll();
         assertThat(patienceDTOS).isNotNull();
@@ -108,7 +108,7 @@ public class PatienceServiceTest {
     }
 
     private Optional<Patience> getOptionalPatience() {
-        return Optional.of(getAllPatiences().get(0));
+        return Optional.of(getAllPatients().get(0));
     }
 
 }

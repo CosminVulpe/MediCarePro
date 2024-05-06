@@ -45,7 +45,7 @@ public class PatienceControllerIT {
 
     @BeforeEach
     void init() {
-        repository.saveAll(TestDummy.getAllPatiences());
+        repository.saveAll(TestDummy.getAllPatients());
     }
 
     @Test
