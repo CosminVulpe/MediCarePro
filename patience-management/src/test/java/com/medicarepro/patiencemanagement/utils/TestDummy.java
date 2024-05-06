@@ -20,7 +20,7 @@ public class TestDummy {
     private TestDummy() {
     }
 
-    public static List<Patience> getAllPatiences() {
+    public static List<Patience> getAllPatients() {
         Patience johnDoe = Patience.builder()
                 .patienceId(generatePatienceId())
                 .build();
@@ -62,7 +62,7 @@ public class TestDummy {
         johnDoe.setContractInformation(johnDoeContract);
         johnDoe.setInsuranceInformation(johnDoeInsurance);
         johnDoe.setMedicalHistory(johnDoeMedicalHistory);
-        johnDoe.setDoctorId(1L);
+        johnDoe.setDoctorIds(Collections.singletonList(1L));
 
 
         Patience janeSmith = Patience.builder()
@@ -106,7 +106,7 @@ public class TestDummy {
         janeSmith.setContractInformation(janeSmithContract);
         janeSmith.setInsuranceInformation(janeSmithInsurance);
         janeSmith.setMedicalHistory(janeSmithMedicalHistory);
-        janeSmith.setDoctorId(2L);
+        janeSmith.setDoctorIds(Collections.singletonList(2L));
 
         Patience maryJohnson = Patience.builder()
                 .patienceId(generatePatienceId())
@@ -149,7 +149,7 @@ public class TestDummy {
         maryJohnson.setContractInformation(maryJohnsonContract);
         maryJohnson.setInsuranceInformation(maryJohnsonInsurance);
         maryJohnson.setMedicalHistory(maryJohnsonMedicalHistory);
-        maryJohnson.setDoctorId(3L);
+        maryJohnson.setDoctorIds(Collections.singletonList(3L));
 
         Patience robertMiller = Patience.builder()
                 .patienceId(generatePatienceId())
@@ -192,7 +192,7 @@ public class TestDummy {
         robertMiller.setContractInformation(robertMillerContract);
         robertMiller.setInsuranceInformation(robertMillerInsurance);
         robertMiller.setMedicalHistory(robertMillerMedicalHistory);
-        robertMiller.setDoctorId(4L);
+        robertMiller.setDoctorIds(Collections.singletonList(4L));
 
         Patience emilyBrown = Patience.builder()
                 .patienceId(generatePatienceId())
@@ -235,12 +235,12 @@ public class TestDummy {
         emilyBrown.setContractInformation(emilyBrownContract);
         emilyBrown.setInsuranceInformation(emilyBrownInsurance);
         emilyBrown.setMedicalHistory(emilyBrownMedicalHistory);
-        emilyBrown.setDoctorId(5L);
+        emilyBrown.setDoctorIds(Collections.singletonList(5L));
         return List.of(johnDoe, janeSmith, maryJohnson, robertMiller, emilyBrown);
     }
 
     public static PatienceRequest getPatienceReqMock() {
-        Patience patience = getAllPatiences().get(0);
+        Patience patience = getAllPatients().get(0);
         return mapToPatienceReq(patience);
     }
 
@@ -253,7 +253,7 @@ public class TestDummy {
         DemographicInformationDTO demographicInformationDTO = DemographicInformationMapping.INSTANCE.convertToDto(patience.getDemographicInformation());
         InsuranceInformationDTO insuranceInformationDTO = InsuranceInformationMapping.INSTANCE.convertToDto(patience.getInsuranceInformation());
         MedicalHistoryDTO medicalHistoryDTO = MedicalHistoryMapping.INSTANCE.convertToDto(patience.getMedicalHistory());
-        return new PatienceRequest(contractInformationDTO, demographicInformationDTO, insuranceInformationDTO, medicalHistoryDTO,"John");
+        return new PatienceRequest(contractInformationDTO, demographicInformationDTO, insuranceInformationDTO, medicalHistoryDTO, Collections.singletonList("John"));
     }
 
     private static Patience mapPatienceEntity(PatienceRequest request) {
