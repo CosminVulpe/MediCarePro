@@ -15,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -72,23 +73,29 @@ public class PatienceServiceTest {
     @Test
     void createPatienceSuccessfully() {
         Patience patience = getOptionalPatience().get();
-        ResponseEntity<DoctorIdResponse> body = ResponseEntity.status(HttpStatus.NO_CONTENT.value()).body(new DoctorIdResponse(1L));
+        ResponseEntity<DoctorIdResponse> body = ResponseEntity.status(HttpStatus.OK.value()).body(new DoctorIdResponse(Collections.singletonList(1L)));
 
         when(patienceRepository.save(any())).thenReturn(patience);
         when(proxyClient.assignPatience(any())).thenReturn(body);
 
         ResponseEntity<PatienceDTO> response = patienceService.createPatience(getPatienceReqMock());
         assertThat(response.getBody()).isNotNull();
-        verify(patienceRepository).save(any());
+        verify(patienceRepository, times(2)).save(any());
     }
 
     @Test
     void shouldThrowExceptionWhenAddingANewPatience() {
+        when(patienceRepository.doesPatienceExist(any())).thenReturn(0);
         doThrow(new PersistenceException()).when(patienceRepository).save(any());
-        ResponseEntity<DoctorIdResponse> body = ResponseEntity.status(HttpStatus.NO_CONTENT.value()).body(new DoctorIdResponse(1L));
-        when(proxyClient.assignPatience(any())).thenReturn(body);
+        assertThatThrownBy(() -> patienceService.createPatience(getPatienceReqMock()))
+                .isInstanceOf(PersistenceException.class);
+    }
 
-        assertThatThrownBy(() -> patienceService.createPatience(getPatienceReqMock())).isInstanceOf(PersistenceException.class);
+    @Test
+    void createNewPatienceReturnConflict() {
+        when(patienceRepository.doesPatienceExist(any())).thenReturn(1);
+        ResponseEntity<PatienceDTO> response = patienceService.createPatience(getPatienceReqMock());
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
     }
 
     @Test
