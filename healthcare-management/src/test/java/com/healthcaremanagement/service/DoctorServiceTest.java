@@ -45,10 +45,11 @@ public class DoctorServiceTest {
     void assignPatienceToDoctor() {
         when(doctorRepository.findDoctorsByName(any())).thenReturn(getAllDoctorsMock());
 
-        ResponseEntity<DoctorIdResponse> doctorIdResponseResponseEntity = doctorService.assignPatience(new PatienceIdRequest(
+        PatienceIdRequest request = new PatienceIdRequest(
                 getAllDoctorsMock().stream().map(Doctor::getName).limit(2).collect(Collectors.toList())
                 , 10L
-        ));
+        );
+        ResponseEntity<DoctorIdResponse> doctorIdResponseResponseEntity = doctorService.assignPatience(request);
 
         assertThat(doctorIdResponseResponseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(doctorIdResponseResponseEntity.getBody()).isNotNull();
