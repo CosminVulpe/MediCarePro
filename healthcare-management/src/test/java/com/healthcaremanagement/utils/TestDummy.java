@@ -4,7 +4,7 @@ import com.healthcaremanagement.service.entity.*;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -33,7 +33,7 @@ public class TestDummy {
         Doctor doctor = Doctor.builder()
                 .name(name)
                 .specialty(DOCTOR_SPECIALTIES[RANDOM.nextInt(DOCTOR_SPECIALTIES.length)])
-                .patienceIds(patienceIds)
+                .patienceIds(new ArrayList<>(patienceIds))
                 .build();
 
         ContactInfo contactInfo = ContactInfo.builder()
