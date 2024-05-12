@@ -58,7 +58,7 @@ public class PatienceService {
                     && Objects.nonNull(doctorIdResponseResponseEntity.getBody())) {
 
                 DoctorIdResponse response = doctorIdResponseResponseEntity.getBody();
-                enrolledPatience.setDoctorIds(response.ids());
+                enrolledPatience.setDoctorIds(new ArrayList<>(response.ids()));
                 patienceRepository.save(enrolledPatience);
             }
 

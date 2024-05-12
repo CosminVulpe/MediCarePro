@@ -103,7 +103,7 @@ public class PatienceControllerIT {
                 , demographicInformationDTO.timeOfBirth(), demographicInformationDTO.married(), demographicInformationDTO.hasKids());
 
         PatienceRequest request = new PatienceRequest(patienceReqMock.contractInformationRequest(), req, patienceReqMock.insuranceInformationRequest()
-                ,patienceReqMock.medicalHistoryRequest(),patienceReqMock.doctorNames());
+                ,patienceReqMock.medicalHistoryRequest(), patienceReqMock.doctorNames());
 
         MockHttpServletRequestBuilder mockHttpServletRequestBuilder = MockMvcRequestBuilders.post(API_PATIENCE + "/create")
                 .accept(APPLICATION_JSON)
