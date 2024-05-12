@@ -4,6 +4,7 @@ import com.healthcaremanagement.controller.dto.DoctorDTO;
 import com.healthcaremanagement.controller.dto.DoctorIdResponse;
 import com.healthcaremanagement.controller.dto.PatienceIdRequest;
 import com.healthcaremanagement.service.DoctorService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +23,7 @@ public class DoctorController {
     }
 
     @PostMapping("/assign")
-    public ResponseEntity<DoctorIdResponse> assignPatience(@RequestBody PatienceIdRequest request) {
+    public ResponseEntity<DoctorIdResponse> assignPatience(@RequestBody @Valid PatienceIdRequest request) {
         return doctorService.assignPatience(request);
     }
 

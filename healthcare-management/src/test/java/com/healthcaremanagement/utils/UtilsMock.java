@@ -8,6 +8,8 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 public final class UtilsMock {
     private final static ObjectMapper jackson = new ObjectMapper().registerModule(new JavaTimeModule());
 
+    private UtilsMock() {}
+
     public static String writeJsonAsString(final Object obj) {
         try {
             return jackson.writeValueAsString(obj);
