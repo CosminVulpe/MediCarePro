@@ -1,5 +1,6 @@
 package com.healthcaremanagement.controller;
 
+import com.healthcaremanagement.controller.dto.AvailabilityCheckRequest;
 import com.healthcaremanagement.controller.dto.DoctorDTO;
 import com.healthcaremanagement.controller.dto.DoctorIdResponse;
 import com.healthcaremanagement.controller.dto.PatienceIdRequest;
@@ -27,4 +28,8 @@ public class DoctorController {
         return doctorService.assignPatience(request);
     }
 
+    @PostMapping("/availability")
+    public Boolean checkAvailability(@RequestBody AvailabilityCheckRequest request) {
+        return doctorService.checkAvailability(request);
+    }
 }

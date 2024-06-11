@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
 import java.time.LocalTime;
 
 @Entity
@@ -21,7 +20,6 @@ public class TimeSlot {
 
     private LocalTime startTime;
     private LocalTime endTime;
-    private LocalDate date;
 
     @OneToOne(fetch = FetchType.LAZY)
     @MapsId

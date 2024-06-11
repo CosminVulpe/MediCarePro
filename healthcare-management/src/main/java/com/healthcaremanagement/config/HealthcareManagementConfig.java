@@ -58,7 +58,7 @@ public class HealthcareManagementConfig {
         TimeSlot timeSlot = TimeSlot.builder()
                 .startTime(LocalTime.of(9 + (int) (Math.random() * 10), 30))
                 .endTime(LocalTime.of(12 + (int) (Math.random() * 9), 30))
-                .date(date)
+//                .date(date)
                 .availability(availability)
                 .build();
 
