@@ -2,6 +2,7 @@ package com.medicarepro.patiencemanagement.controller;
 
 import com.medicarepro.patiencemanagement.controller.dto.PatienceDTO;
 import com.medicarepro.patiencemanagement.controller.dto.PatienceRequest;
+import com.medicarepro.patiencemanagement.controller.dto.ScheduleAppointmentRequest;
 import com.medicarepro.patiencemanagement.service.PatienceService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +40,11 @@ public class PatienceController {
     @DeleteMapping("/delete/{patienceId}")
     public void deletePatience(@PathVariable Long patienceId) {
         patienceService.deletePatienceById(patienceId);
+    }
+
+    @PostMapping("/schedule")
+    public ResponseEntity<String> scheduleAppointmentHeathCare(@RequestBody ScheduleAppointmentRequest request) {
+        return patienceService.scheduleAppoint(request);
     }
 
 }

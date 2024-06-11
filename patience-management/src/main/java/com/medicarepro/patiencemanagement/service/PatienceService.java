@@ -7,6 +7,7 @@ import com.medicarepro.patiencemanagement.service.mapping.ContractInformationMap
 import com.medicarepro.patiencemanagement.service.mapping.DemographicInformationMapping;
 import com.medicarepro.patiencemanagement.service.mapping.InsuranceInformationMapping;
 import com.medicarepro.patiencemanagement.service.mapping.MedicalHistoryMapping;
+import com.medicarepro.patiencemanagement.service.repository.AppointmentProxyClient;
 import com.medicarepro.patiencemanagement.service.repository.HealthcareProxyClient;
 import com.medicarepro.patiencemanagement.service.repository.PatienceRepository;
 import jakarta.persistence.PersistenceException;
@@ -15,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -28,6 +30,7 @@ import static org.springframework.http.HttpStatus.CREATED;
 public class PatienceService {
     private final PatienceRepository patienceRepository;
     private final HealthcareProxyClient healthcareProxyClient;
+    private final AppointmentProxyClient appointmentProxyClient;
 
     public List<PatienceDTO> getAll() {
         List<Patience> patienceList = patienceRepository.findAll();
@@ -80,6 +83,29 @@ public class PatienceService {
         Patience patience = getPatienceOrThrow(patienceId);
         log.info("Patience with patienceId {} was deleted", patience.getPatienceId());
         patienceRepository.delete(patience);
+    }
+
+    public ResponseEntity<String> scheduleAppoint(ScheduleAppointmentRequest request) {
+        AvailabilityCheckRequest availabilityCheckRequest = new AvailabilityCheckRequest(request.doctorId(), request.dayOfWeek(), request.time());
+        Boolean availability = healthcareProxyClient.checkAvailability(availabilityCheckRequest);
+        if (!availability) {
+            log.warn("No available slot for the {}", request);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("No availability");
+        }
+        AppointmentSchedulerRequest appointmentSchedulerRequest = new AppointmentSchedulerRequest(request.doctorId(), request.patienceId()
+                , request.dayOfWeek(), request.time(), request.notes());
+
+        ResponseEntity<HttpStatus> responseEntity = appointmentProxyClient.scheduleAppointment(appointmentSchedulerRequest);
+        if (!responseEntity.getStatusCode().is2xxSuccessful()) {
+            String errorMsg = "Unable to schedule appointment";
+            log.error(errorMsg);
+            throw new RestClientException(errorMsg);
+        }
+
+        return ResponseEntity.ok("Appointment scheduled successfully at "
+                + request.time()
+                + " day of the week "
+                + request.dayOfWeek());
     }
 
     private Patience getPatienceOrThrow(Long patienceId) {

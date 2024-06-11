@@ -1,5 +1,6 @@
 package com.medicarepro.patiencemanagement.service.repository;
 
+import com.medicarepro.patiencemanagement.controller.dto.AvailabilityCheckRequest;
 import com.medicarepro.patiencemanagement.controller.dto.DoctorIdResponse;
 import com.medicarepro.patiencemanagement.controller.dto.PatienceIdRequest;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -13,4 +14,7 @@ public interface HealthcareProxyClient {
 
     @PostMapping(url + "/assign")
     ResponseEntity<DoctorIdResponse> assignPatience(@RequestBody PatienceIdRequest request);
+
+    @PostMapping(url + "/availability")
+    Boolean checkAvailability(AvailabilityCheckRequest request);
 }
