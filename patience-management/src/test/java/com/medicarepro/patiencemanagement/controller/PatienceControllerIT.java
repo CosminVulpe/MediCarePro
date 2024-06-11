@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.medicarepro.patiencemanagement.controller.dto.*;
 import com.medicarepro.patiencemanagement.service.entity.ContractInformation;
 import com.medicarepro.patiencemanagement.service.entity.Patience;
+import com.medicarepro.patiencemanagement.service.repository.AppointmentProxyClient;
 import com.medicarepro.patiencemanagement.service.repository.HealthcareProxyClient;
 import com.medicarepro.patiencemanagement.service.repository.PatienceRepository;
 import com.medicarepro.patiencemanagement.utils.TestDummy;
@@ -21,6 +22,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.time.DayOfWeek;
+import java.time.LocalTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -44,7 +47,10 @@ public class PatienceControllerIT {
     private MockMvc mockMvc;
 
     @MockBean
-    private HealthcareProxyClient proxyClient;
+    private HealthcareProxyClient healthcareProxyClient;
+
+    @MockBean
+    private AppointmentProxyClient appointmentProxyClient;
 
     @Autowired
     private PatienceRepository repository;
@@ -95,7 +101,7 @@ public class PatienceControllerIT {
         ResponseEntity<DoctorIdResponse> body = ResponseEntity.status(HttpStatus.OK.value())
                 .body(new DoctorIdResponse(List.of(1L)));
 
-        when(proxyClient.assignPatience(any())).thenReturn(body);
+        when(healthcareProxyClient.assignPatience(any())).thenReturn(body);
 
         PatienceRequest patienceReqMock = getPatienceReqMock();
         DemographicInformationDTO demographicInformationDTO = patienceReqMock.demographicInformationRequest();
@@ -103,7 +109,7 @@ public class PatienceControllerIT {
                 , demographicInformationDTO.timeOfBirth(), demographicInformationDTO.married(), demographicInformationDTO.hasKids());
 
         PatienceRequest request = new PatienceRequest(patienceReqMock.contractInformationRequest(), req, patienceReqMock.insuranceInformationRequest()
-                ,patienceReqMock.medicalHistoryRequest(), patienceReqMock.doctorNames());
+                , patienceReqMock.medicalHistoryRequest(), patienceReqMock.doctorNames());
 
         MockHttpServletRequestBuilder mockHttpServletRequestBuilder = MockMvcRequestBuilders.post(API_PATIENCE + "/create")
                 .accept(APPLICATION_JSON)
@@ -153,6 +159,28 @@ public class PatienceControllerIT {
         assertThat(patienceOptional).isEmpty();
     }
 
+    @Test
+    void scheduleAppointmentSuccessfully() throws Exception {
+        when(healthcareProxyClient.checkAvailability(any())).thenReturn(true);
+        when(appointmentProxyClient.scheduleAppointment(any())).thenReturn(new ResponseEntity<>(HttpStatus.OK));
+
+        MockHttpServletRequestBuilder builder = MockMvcRequestBuilders.post(API_PATIENCE + "/schedule")
+                .accept(APPLICATION_JSON)
+                .content(writeJsonAsString(getScheduleAppointmentMock()))
+                .contentType(APPLICATION_JSON);
+        mockMvc.perform(builder).andExpect(status().isOk());
+    }
+
+    @Test
+    void scheduleAppointmentNoAvailability() throws Exception {
+        when(healthcareProxyClient.checkAvailability(any())).thenReturn(false);
+
+        MockHttpServletRequestBuilder builder = MockMvcRequestBuilders.post(API_PATIENCE + "/schedule")
+                .accept(APPLICATION_JSON)
+                .content(writeJsonAsString(getScheduleAppointmentMock()))
+                .contentType(APPLICATION_JSON);
+        mockMvc.perform(builder).andExpect(status().isNoContent());
+    }
 
     private MockHttpServletRequestBuilder getMockHttpServletRequestBuilder(Long params) {
         if (params == null) {
@@ -176,5 +204,9 @@ public class PatienceControllerIT {
 
     private Patience getPatience(int i) {
         return repository.findAll().get(i);
+    }
+
+    private ScheduleAppointmentRequest getScheduleAppointmentMock() {
+        return new ScheduleAppointmentRequest(LocalTime.of(13, 30, 0), DayOfWeek.SATURDAY, "", 1L, 2L);
     }
 }
