@@ -2,8 +2,10 @@ package com.medicarepro.patiencemanagement.service;
 
 import com.medicarepro.patiencemanagement.controller.dto.DoctorIdResponse;
 import com.medicarepro.patiencemanagement.controller.dto.PatienceDTO;
+import com.medicarepro.patiencemanagement.controller.dto.ScheduleAppointmentRequest;
 import com.medicarepro.patiencemanagement.service.entity.Patience;
 import com.medicarepro.patiencemanagement.service.exception.PatienceIdException;
+import com.medicarepro.patiencemanagement.service.repository.AppointmentProxyClient;
 import com.medicarepro.patiencemanagement.service.repository.HealthcareProxyClient;
 import com.medicarepro.patiencemanagement.service.repository.PatienceRepository;
 import jakarta.persistence.PersistenceException;
@@ -14,8 +16,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestClientException;
 
-import java.util.Collections;
+import java.time.DayOfWeek;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,7 +37,9 @@ public class PatienceServiceTest {
     @Mock
     private PatienceRepository patienceRepository;
     @Mock
-    private HealthcareProxyClient proxyClient;
+    private HealthcareProxyClient healthcareProxyClient;
+    @Mock
+    private AppointmentProxyClient appointmentProxyClient;
 
     @InjectMocks
     private PatienceService patienceService;
@@ -73,10 +79,12 @@ public class PatienceServiceTest {
     @Test
     void createPatienceSuccessfully() {
         Patience patience = getOptionalPatience().get();
-        ResponseEntity<DoctorIdResponse> body = ResponseEntity.status(HttpStatus.OK.value()).body(new DoctorIdResponse(Collections.singletonList(1L)));
+        patience.setId(1L);
+
+        ResponseEntity<DoctorIdResponse> doctorIdResponseResponseEntity = new ResponseEntity<>(new DoctorIdResponse(List.of(1L)), HttpStatus.OK);
 
         when(patienceRepository.save(any())).thenReturn(patience);
-        when(proxyClient.assignPatience(any())).thenReturn(body);
+        when(healthcareProxyClient.assignPatience(any())).thenReturn(doctorIdResponseResponseEntity);
 
         ResponseEntity<PatienceDTO> response = patienceService.createPatience(getPatienceReqMock());
         assertThat(response.getBody()).isNotNull();
@@ -113,6 +121,46 @@ public class PatienceServiceTest {
         patienceService.deletePatienceById(ID);
         verify(patienceRepository).delete(any());
     }
+
+    @Test
+    void scheduleAppointment() {
+        ScheduleAppointmentRequest request = new ScheduleAppointmentRequest(LocalTime.of(13, 30, 0), DayOfWeek.SATURDAY, "", 1L, 2L);
+        when(healthcareProxyClient.checkAvailability(any())).thenReturn(Boolean.TRUE);
+
+        when(appointmentProxyClient.scheduleAppointment(any())).thenReturn(
+                new ResponseEntity<>(HttpStatus.OK)
+        );
+
+        ResponseEntity<String> stringResponseEntity = patienceService.scheduleAppoint(request);
+
+        assertThat(stringResponseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(stringResponseEntity.getBody()).isEqualTo("Appointment scheduled successfully at " + request.time() + " day of the week " + request.dayOfWeek());
+    }
+
+    @Test
+    void scheduleAppointmentThrowsException() {
+        ScheduleAppointmentRequest request = new ScheduleAppointmentRequest(LocalTime.of(13, 30, 0), DayOfWeek.SATURDAY, "", 1L, 2L);
+        when(healthcareProxyClient.checkAvailability(any())).thenReturn(Boolean.TRUE);
+
+        when(appointmentProxyClient.scheduleAppointment(any())).thenReturn(
+                new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR)
+        );
+
+        assertThatThrownBy(() -> patienceService.scheduleAppoint(request))
+                .isInstanceOf(RestClientException.class)
+                .hasMessage("Unable to schedule appointment");
+    }
+
+    @Test
+    void scheduleAppointmentNoAvailability() {
+        ScheduleAppointmentRequest request = new ScheduleAppointmentRequest(LocalTime.of(13, 30, 0), DayOfWeek.SATURDAY, "", 1L, 2L);
+        when(healthcareProxyClient.checkAvailability(any())).thenReturn(Boolean.FALSE);
+        ResponseEntity<String> stringResponseEntity = patienceService.scheduleAppoint(request);
+
+        assertThat(stringResponseEntity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+        assertThat(stringResponseEntity.getBody()).isEqualTo("No availability");
+    }
+
 
     private Optional<Patience> getOptionalPatience() {
         return Optional.of(getAllPatients().get(0));
